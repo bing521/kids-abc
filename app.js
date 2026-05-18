@@ -450,7 +450,6 @@ function startTopic(topicId) {
   state.practiced = [];
   showScreen("game");
   renderItem();
-  window.setTimeout(() => speak(currentItem().phrase), 250);
 }
 
 function markAttempt(success, transcript = "") {
@@ -523,7 +522,6 @@ function nextItem() {
   if (state.index < state.topic.items.length - 1) {
     state.index += 1;
     renderItem();
-    window.setTimeout(() => speak(currentItem().phrase), 200);
     return;
   }
 
