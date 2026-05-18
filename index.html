@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kid's ABC</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>🔤 Kid's ABC</h1>
+      <p class="subtitle">Learn the alphabet with fun!</p>
+    </header>
+
+    <main>
+      <section class="letter-display">
+        <div class="letter-card" id="letterCard">
+          <span class="letter" id="letter">A</span>
+          <span class="word" id="word">Apple</span>
+          <img class="image" id="image" src="" alt="" />
+        </div>
+      </section>
+
+      <section class="controls">
+        <button id="prevBtn" class="btn">← Prev</button>
+        <button id="nextBtn" class="btn">Next →</button>
+      </section>
+
+      <section class="letter-grid" id="letterGrid"></section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
