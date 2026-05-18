@@ -9,7 +9,10 @@ const state = {
   attempts: 0,
   practiced: [],
   listening: false,
-  recognition: null
+  recognition: null,
+  mediaRecorder: null,
+  audioChunks: [],
+  recordedBlob: null
 };
 
 const screens = {
@@ -33,6 +36,7 @@ const feedbackTitle = document.querySelector("#feedback-title");
 const feedbackDetail = document.querySelector("#feedback-detail");
 const listenButton = document.querySelector("#listen-button");
 const speakButton = document.querySelector("#speak-button");
+const replayButton = document.querySelector("#replay-button");
 const nextButton = document.querySelector("#next-button");
 const soundButton = document.querySelector("#sound-button");
 const miniMovie = document.querySelector("#mini-movie");
@@ -162,7 +166,7 @@ function makeGirlVoiceUtterance(text, options = {}) {
   utterance.voice = getFriendlyVoice(voiceType);
   utterance.rate = options.rate || 1.0;
   utterance.pitch = options.pitch || 1;
-  utterance.volume = 0.9;
+  utterance.volume = 1.0;
   return utterance;
 }
 
@@ -459,6 +463,9 @@ function startTopic(topicId) {
   state.index = 0;
   state.attempts = 0;
   state.practiced = [];
+  state.recordedBlob = null;
+  state.audioChunks = [];
+  replayButton?.classList.add("hidden");
   showScreen("game");
   renderItem();
 }
@@ -491,6 +498,57 @@ function markAttempt(success, transcript = "") {
   }
 }
 
+// 录音功能
+async function startRecording() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    console.warn("浏览器不支持录音");
+    return false;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    state.mediaRecorder = new MediaRecorder(stream);
+    state.audioChunks = [];
+    state.mediaRecorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        state.audioChunks.push(event.data);
+      }
+    };
+    state.mediaRecorder.start();
+    return true;
+  } catch (e) {
+    console.error("无法访问麦克风:", e);
+    return false;
+  }
+}
+
+function stopRecording() {
+  if (state.mediaRecorder && state.mediaRecorder.state !== "inactive") {
+    state.mediaRecorder.stop();
+    state.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+  }
+}
+
+function getRecordedAudio() {
+  if (state.audioChunks.length === 0) return null;
+  return URL.createObjectURL(new Blob(state.audioChunks, { type: "audio/webm" }));
+}
+
+function playRecording() {
+  const audioUrl = getRecordedAudio();
+  if (!audioUrl) {
+    setFeedback("提示", "还没有录音，先点击跟我说录一段吧。");
+    return;
+  }
+  const audio = new Audio(audioUrl);
+  audio.volume = 1;
+  audio.play();
+  setFeedback("回放中...", "听一下刚才说的。");
+  audio.onended = () => {
+    URL.revokeObjectURL(audioUrl);
+    setFeedback("闯关任务开始！", "先听英文，再按下跟我说。说出口就能点亮这一关。");
+  };
+}
+
 function startRecognition() {
   const item = currentItem();
 
@@ -501,54 +559,75 @@ function startRecognition() {
 
   if (state.listening) {
     state.recognition?.abort?.();
+    stopRecording();
     state.listening = false;
+    speakButton.innerHTML = '<span aria-hidden="true">●</span>跟我说';
     return;
   }
 
-  const recognition = new SpeechRecognition();
-  state.recognition = recognition;
-  state.listening = true;
-  recognition.lang = "en-US";
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-  recognition.didHearResult = false;
+  // 开始录音
+  startRecording().then(recordingStarted => {
+    if (!recordingStarted) {
+      setFeedback("提示", "无法访问麦克风，请检查权限设置。");
+      return;
+    }
 
-  speakButton.textContent = "正在听...";
-  setFeedback("我在听哦", `请孩子说："${item.phrase}"。`);
+    const recognition = new SpeechRecognition();
+    state.recognition = recognition;
+    state.listening = true;
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.didHearResult = false;
 
-  recognition.onresult = (event) => {
-    recognition.didHearResult = true;
-    const transcript = event.results[0][0].transcript;
-    const matched = roughlyMatches(transcript, item.phrase);
-    markAttempt(matched, transcript);
-  };
+    speakButton.textContent = "正在听...";
+    setFeedback("我在听哦", `请孩子说："${item.phrase}"。`);
 
-  recognition.onerror = (event) => {
-    recognition.didHearResult = true;
-    // 如果是用户主动停止，不显示错误
-    if (event.error === 'aborted') return;
-    console.warn("语音识别错误:", event.error);
-    markAttempt(false);
-  };
+    recognition.onresult = (event) => {
+      recognition.didHearResult = true;
+      stopRecording();
+      const transcript = event.results[0][0].transcript;
+      const matched = roughlyMatches(transcript, item.phrase);
+      replayButton?.classList.remove("hidden");
+      markAttempt(matched, transcript);
+    };
 
-  recognition.onend = () => {
-    state.listening = false;
-    speakButton.innerHTML = '<span aria-hidden="true">●</span>跟我说';
-  };
+    recognition.onerror = (event) => {
+      recognition.didHearResult = true;
+      stopRecording();
+      if (event.error === 'aborted') return;
+      console.warn("语音识别错误:", event.error);
+      replayButton?.classList.remove("hidden");
+      markAttempt(false);
+    };
 
-  try {
-    recognition.start();
-  } catch (e) {
-    console.error("无法启动语音识别:", e);
-    state.listening = false;
-    speakButton.innerHTML = '<span aria-hidden="true">●</span>跟我说';
-    setFeedback("提示", "无法启动语音识别，请检查麦克风权限。");
-  }
+    recognition.onend = () => {
+      stopRecording();
+      state.listening = false;
+      speakButton.innerHTML = '<span aria-hidden="true">●</span>跟我说';
+      if (!recognition.didHearResult && state.audioChunks.length > 0) {
+        replayButton?.classList.remove("hidden");
+      }
+    };
+
+    try {
+      recognition.start();
+    } catch (e) {
+      console.error("无法启动语音识别:", e);
+      stopRecording();
+      state.listening = false;
+      speakButton.innerHTML = '<span aria-hidden="true">●</span>跟我说';
+      setFeedback("提示", "无法启动语音识别，请检查麦克风权限。");
+    }
+  });
 }
 
 function nextItem() {
   if (state.index < state.topic.items.length - 1) {
     state.index += 1;
+    state.recordedBlob = null;
+    state.audioChunks = [];
+    replayButton?.classList.add("hidden");
     renderItem();
     return;
   }
@@ -582,6 +661,7 @@ function bindEvents() {
   document.querySelector("#hero-start-button")?.addEventListener("click", randomStart);
   listenButton.addEventListener("click", () => speak(currentItem().phrase));
   speakButton.addEventListener("click", startRecognition);
+  replayButton?.addEventListener("click", playRecording);
   nextButton.addEventListener("click", () => {
     if (nextButton.getAttribute("aria-disabled") === "true") {
       playLockedSound();

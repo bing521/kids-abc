@@ -1187,7 +1187,7 @@ h1 {
 
 .control-panel {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 14px;
 }
 
@@ -1227,6 +1227,10 @@ h1 {
 
 .speak-button {
   background: linear-gradient(135deg, #ff6f87, #ff9c4a);
+}
+
+.replay-button {
+  background: linear-gradient(135deg, #5ee0b7, #42b7ff);
 }
 
 .secondary {
