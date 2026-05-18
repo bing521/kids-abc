@@ -22,7 +22,13 @@
             <p class="eyebrow">亲子英语启蒙</p>
             <h1 id="app-title">Little Echo</h1>
           </div>
-          <div class="privacy-chip">不保存录音</div>
+          <div class="topbar-actions">
+            <div class="voice-picker" id="voice-options" aria-label="选择朗读声音">
+              <button class="voice-choice" type="button" data-voice="girl" aria-pressed="true">女生</button>
+              <button class="voice-choice" type="button" data-voice="boy" aria-pressed="false">男生</button>
+            </div>
+            <div class="privacy-chip">不保存录音</div>
+          </div>
         </div>
 
         <div class="hero-band">
@@ -58,6 +64,43 @@
             <div class="status-line" id="support-status">正在检测语音能力...</div>
           </div>
         </div>
+
+        <section class="mini-movie" id="mini-movie" aria-label="英语动画小视频">
+          <div class="movie-stage" aria-hidden="true">
+            <div class="movie-sun"></div>
+            <div class="movie-cloud cloud-one"></div>
+            <div class="movie-cloud cloud-two"></div>
+            <div class="movie-path"></div>
+            <div class="movie-card card-cat">cat</div>
+            <div class="movie-card card-dog">dog</div>
+            <div class="movie-card card-run">run</div>
+            <div class="movie-kid">
+              <span class="kid-shadow"></span>
+              <span class="kid-head"></span>
+              <span class="kid-hair"></span>
+              <span class="kid-face">
+                <i class="kid-eye eye-left"></i>
+                <i class="kid-eye eye-right"></i>
+                <i class="kid-smile"></i>
+                <i class="kid-blush blush-left"></i>
+                <i class="kid-blush blush-right"></i>
+              </span>
+              <span class="kid-body"></span>
+              <span class="kid-arm arm-left"></span>
+              <span class="kid-arm arm-right"></span>
+              <span class="kid-leg leg-left"></span>
+              <span class="kid-leg leg-right"></span>
+              <span class="kid-shoe shoe-left"></span>
+              <span class="kid-shoe shoe-right"></span>
+            </div>
+          </div>
+          <div class="movie-copy">
+            <p class="eyebrow">动画小视频</p>
+            <h2>跟着小朋友边看边说</h2>
+            <p>cat、dog、run 会轮流出现，先看一遍，再去闯关。</p>
+            <button class="movie-toggle" id="movie-toggle" type="button" aria-pressed="false">暂停动画</button>
+          </div>
+        </section>
 
         <div class="map-title">
           <p class="eyebrow">选择冒险地图</p>

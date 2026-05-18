@@ -35,9 +35,14 @@ const listenButton = document.querySelector("#listen-button");
 const speakButton = document.querySelector("#speak-button");
 const nextButton = document.querySelector("#next-button");
 const soundButton = document.querySelector("#sound-button");
+const miniMovie = document.querySelector("#mini-movie");
+const movieToggle = document.querySelector("#movie-toggle");
+const voiceOptions = document.querySelector("#voice-options");
 
 let audioContext = null;
 let preferredVoice = null;
+let selectedVoiceType = window.localStorage.getItem("little-echo-voice-type") || "girl";
+let audioManifest = { phrases: {}, ui: {} };
 
 function getAudioContext() {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -49,7 +54,7 @@ function getAudioContext() {
   return audioContext;
 }
 
-function playToneSequence(notes, type = "sine", volume = 0.12) {
+function playToneSequence(notes, type = "sine", volume = 0.06) {
   const context = getAudioContext();
   if (!context) return;
 
@@ -60,7 +65,7 @@ function playToneSequence(notes, type = "sine", volume = 0.12) {
     oscillator.type = type;
     oscillator.frequency.setValueAtTime(frequency, start + offset);
     gain.gain.setValueAtTime(0.001, start + offset);
-    gain.gain.exponentialRampToValueAtTime(volume, start + offset + 0.018);
+    gain.gain.exponentialRampToValueAtTime(volume, start + offset + 0.026);
     gain.gain.exponentialRampToValueAtTime(0.001, start + offset + duration);
     oscillator.connect(gain).connect(context.destination);
     oscillator.start(start + offset);
@@ -69,25 +74,114 @@ function playToneSequence(notes, type = "sine", volume = 0.12) {
 }
 
 function playSparkleSound() {
-  playToneSequence([[660, 0, 0.08], [880, 0.08, 0.1], [1175, 0.18, 0.12]], "triangle", 0.09);
+  playToneSequence([[392, 0, 0.08], [523, 0.09, 0.1]], "sine", 0.035);
 }
 
 function playSuccessSound() {
-  playToneSequence([[523, 0, 0.09], [659, 0.08, 0.09], [784, 0.16, 0.16], [1047, 0.3, 0.18]], "triangle", 0.12);
+  playToneSequence([[440, 0, 0.1], [554, 0.1, 0.12], [659, 0.22, 0.16]], "sine", 0.045);
 }
 
 function playTreasureSound() {
-  playToneSequence([[523, 0, 0.1], [659, 0.08, 0.1], [784, 0.16, 0.1], [1047, 0.25, 0.22], [1319, 0.42, 0.24]], "triangle", 0.13);
+  playToneSequence([[392, 0, 0.12], [494, 0.12, 0.12], [587, 0.24, 0.18], [784, 0.42, 0.2]], "sine", 0.05);
 }
 
-function getFriendlyVoice() {
+function audioKey(text) {
+  return normalize(text).replace(/\s+/g, "-");
+}
+
+async function loadAudioManifest() {
+  try {
+    const response = await fetch("./audio-manifest.json", { cache: "no-store" });
+    if (!response.ok) return;
+    const manifest = await response.json();
+    audioManifest = {
+      phrases: manifest.phrases || {},
+      ui: manifest.ui || {}
+    };
+  } catch (error) {
+    audioManifest = { phrases: {}, ui: {} };
+  }
+}
+
+function getAudioSource(text) {
+  const key = audioKey(text);
+  const typedPhrases = audioManifest.phrases?.[selectedVoiceType] || {};
+  return typedPhrases[text] || typedPhrases[key] || audioManifest.phrases[text] || audioManifest.phrases[key] || null;
+}
+
+function playAudioSource(src) {
+  if (!src) return false;
+  window.speechSynthesis?.cancel();
+  const audio = new Audio(src);
+  audio.volume = 0.96;
+  audio.play().catch((error) => console.warn("Audio playback failed", error));
+  return true;
+}
+
+function getUsableEnglishVoices() {
   if (!window.speechSynthesis) return null;
-  if (preferredVoice) return preferredVoice;
   const voices = window.speechSynthesis.getVoices();
-  preferredVoice = voices.find((voice) => /Samantha|Jenny|Aria|Joanna|Google US English|English United States/i.test(voice.name)) ||
-    voices.find((voice) => /^en[-_](US|GB)/i.test(voice.lang)) ||
-    null;
-  return preferredVoice;
+  return voices.filter((voice) =>
+    /^en[-_](US|GB|AU|CA)/i.test(voice.lang) &&
+    !/compact|novelty|whisper|zarvox|bells|boing|bubbles|bad news|good news|organ|trinoids|cellos|bahh/i.test(voice.name)
+  );
+}
+
+function scoreVoice(voice, type = selectedVoiceType) {
+  let score = 0;
+  const girlVoice = /Samantha|Jenny|Aria|Ava|Nicky|Zira|Joanna|Kendra|Kimberly|Serena|Tessa|Moira|Flo|Shelley|female|girl/i;
+  const boyVoice = /Aaron|Albert|Daniel|Fred|Alex|Tom|David|Mark|George|Arthur|Eddy|Reed|Rocko|male|boy/i;
+
+  if (type === "girl" && girlVoice.test(voice.name)) score += 90;
+  if (type === "girl" && boyVoice.test(voice.name)) score -= 80;
+  if (type === "boy" && boyVoice.test(voice.name)) score += 90;
+  if (type === "boy" && girlVoice.test(voice.name)) score -= 80;
+  if (/Google US English|English United States|Microsoft/i.test(voice.name)) score += 24;
+  if (/natural|premium|enhanced/i.test(voice.name)) score += 18;
+  if (/en[-_]US/i.test(voice.lang)) score += 14;
+  return score;
+}
+
+function getFriendlyVoice(type = selectedVoiceType) {
+  if (!window.speechSynthesis) return null;
+  const voices = getUsableEnglishVoices() || [];
+  const cacheKey = `${type}:${voices.length}`;
+  if (preferredVoice?.cacheKey === cacheKey) return preferredVoice.voice;
+
+  const voice = voices
+    .map((item) => ({ voice: item, score: scoreVoice(item, type) }))
+    .sort((a, b) => b.score - a.score)[0]?.voice || null;
+  preferredVoice = { cacheKey, voice };
+  return preferredVoice.voice;
+}
+
+function makeGirlVoiceUtterance(text, options = {}) {
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "en-US";
+  utterance.voice = getFriendlyVoice();
+  utterance.rate = options.rate || 1.0;
+  utterance.pitch = options.pitch || 1;
+  utterance.volume = 0.9;
+  return utterance;
+}
+
+function renderVoiceOptions() {
+  if (!voiceOptions) return;
+  voiceOptions.querySelectorAll("[data-voice]").forEach((button) => {
+    const selected = button.dataset.voice === selectedVoiceType;
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+}
+
+function previewVoice(voiceId) {
+  if (!window.speechSynthesis) return;
+  selectedVoiceType = voiceId === "boy" ? "boy" : "girl";
+  window.localStorage.setItem("little-echo-voice-type", selectedVoiceType);
+  preferredVoice = null;
+  renderVoiceOptions();
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(makeGirlVoiceUtterance("Hello, let's learn English."));
 }
 
 function showScreen(name) {
@@ -251,35 +345,37 @@ function saveTopicProgress(topicId, completedCount) {
 }
 
 function speak(text) {
+  if (playAudioSource(getAudioSource(text))) {
+    return;
+  }
+
   if (!window.speechSynthesis) {
     setFeedback("可以家长先读一遍", `请家长读：“${text}”，然后让孩子模仿。`);
     return;
   }
 
-  playSparkleSound();
   window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "en-US";
-  utterance.voice = getFriendlyVoice();
-  utterance.rate = 0.72;
-  utterance.pitch = 1.32;
-  utterance.volume = 1;
+  const utterance = makeGirlVoiceUtterance(text);
   window.speechSynthesis.speak(utterance);
 }
 
 function playWelcomeSound() {
+  const welcomeAudio = audioManifest.ui?.[selectedVoiceType]?.welcome || audioManifest.ui?.welcome;
+  if (playAudioSource(welcomeAudio)) {
+    soundButton.hidden = true;
+    return;
+  }
+
   if (!window.speechSynthesis) {
     soundButton.hidden = true;
     return;
   }
 
-  playToneSequence([[523, 0, 0.1], [659, 0.09, 0.1], [784, 0.18, 0.12], [1047, 0.32, 0.22]], "triangle", 0.1);
   window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance("Welcome to Little Echo! Let's start the adventure!");
-  utterance.lang = "en-US";
-  utterance.voice = getFriendlyVoice();
-  utterance.rate = 0.82;
-  utterance.pitch = 1.36;
+  const utterance = makeGirlVoiceUtterance("Welcome to Little Echo! Let's start the adventure!", {
+    rate: 1.0,
+    pitch: 1
+  });
   utterance.onend = () => {
     soundButton.hidden = true;
   };
@@ -287,7 +383,7 @@ function playWelcomeSound() {
 }
 
 function playLockedSound() {
-  playToneSequence([[220, 0, 0.08], [165, 0.1, 0.1]], "sine", 0.12);
+  playToneSequence([[196, 0, 0.08], [174, 0.1, 0.1]], "sine", 0.04);
 }
 
 function setNextLocked(locked) {
@@ -468,6 +564,15 @@ function bindEvents() {
     nextItem();
   });
   soundButton.addEventListener("click", playWelcomeSound);
+  voiceOptions.addEventListener("click", (event) => {
+    const option = event.target.closest("[data-voice]");
+    if (option) previewVoice(option.dataset.voice);
+  });
+  movieToggle.addEventListener("click", () => {
+    const paused = miniMovie.classList.toggle("is-paused");
+    movieToggle.textContent = paused ? "播放动画" : "暂停动画";
+    movieToggle.setAttribute("aria-pressed", String(paused));
+  });
   document.querySelector("#repeat-button").addEventListener("click", () => startTopic(state.topic.id));
   document.querySelector("#home-button").addEventListener("click", () => showScreen("topic"));
 }
@@ -475,9 +580,12 @@ function bindEvents() {
 async function initApp() {
   supportStatus.textContent = "正在加载本地词表...";
   bindEvents();
+  await loadAudioManifest();
+  renderVoiceOptions();
   if (window.speechSynthesis) {
     window.speechSynthesis.onvoiceschanged = () => {
       preferredVoice = null;
+      renderVoiceOptions();
       getFriendlyVoice();
     };
     getFriendlyVoice();
@@ -489,7 +597,6 @@ async function initApp() {
     supportStatus.textContent = speechSupported
       ? "支持跟读识别；录音不会保存。"
       : "当前浏览器不支持识别，将使用家长确认。";
-    window.setTimeout(playWelcomeSound, 450);
   } catch (error) {
     console.error(error);
     topicGrid.innerHTML = '<div class="load-error">词表加载失败。请用本地服务打开页面，并检查 words.json 格式。</div>';
