@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Little Echo 英语跟读</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section id="topic-screen" class="screen topic-screen" aria-labelledby="app-title">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">亲子英语启蒙</p>
+            <h1 id="app-title">Little Echo</h1>
+          </div>
+          <div class="privacy-chip">不保存录音</div>
+        </div>
+
+        <div class="hero-band">
+          <div class="mascot" aria-hidden="true">
+            <svg viewBox="0 0 180 180" role="img">
+              <circle cx="90" cy="90" r="74" fill="#ffe08a" />
+              <circle cx="68" cy="74" r="10" fill="#30313d" />
+              <circle cx="112" cy="74" r="10" fill="#30313d" />
+              <path d="M62 112c16 20 40 20 56 0" fill="none" stroke="#30313d" stroke-width="8" stroke-linecap="round" />
+              <path d="M32 91c-18-12-19-34-4-45 15-10 34 0 37 18" fill="#ffb7a0" />
+              <path d="M148 91c18-12 19-34 4-45-15-10-34 0-37 18" fill="#ffb7a0" />
+              <circle cx="58" cy="96" r="9" fill="#ff9aa8" />
+              <circle cx="122" cy="96" r="9" fill="#ff9aa8" />
+            </svg>
+          </div>
+          <div>
+            <p class="hero-copy">每天 5-10 分钟，听一听，说一说，和孩子一起把英文说出口。</p>
+            <div class="status-line" id="support-status">正在检测语音能力...</div>
+          </div>
+        </div>
+
+        <div class="topic-grid" id="topic-grid" aria-label="选择练习主题"></div>
+      </section>
+
+      <section id="game-screen" class="screen game-screen hidden" aria-live="polite">
+        <div class="game-header">
+          <button class="icon-button" id="back-button" type="button" aria-label="返回主题">
+            <span aria-hidden="true">‹</span>
+          </button>
+          <div class="progress-wrap" aria-label="练习进度">
+            <div class="progress-track">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <span id="progress-text">1 / 6</span>
+          </div>
+        </div>
+
+        <div class="word-stage">
+          <div class="illustration-frame" id="illustration-frame"></div>
+          <p class="prompt-label">Listen and say</p>
+          <h2 id="word-text">cat</h2>
+          <p id="word-meaning" class="meaning">小猫</p>
+        </div>
+
+        <div class="control-panel">
+          <button class="action-button listen-button" id="listen-button" type="button">
+            <span aria-hidden="true">▶</span>
+            听一听
+          </button>
+          <button class="action-button speak-button" id="speak-button" type="button">
+            <span aria-hidden="true">●</span>
+            跟我说
+          </button>
+        </div>
+
+        <div class="feedback-panel" id="feedback-panel">
+          <p id="feedback-title">先听英文，再一起说。</p>
+          <p id="feedback-detail">家长可以先示范一次，然后让孩子模仿。</p>
+        </div>
+
+        <button class="next-button" id="next-button" type="button" disabled>下一题</button>
+      </section>
+
+      <section id="summary-screen" class="screen summary-screen hidden">
+        <div class="summary-hero">
+          <div class="summary-badge" aria-hidden="true">★</div>
+          <h2>今天开口啦！</h2>
+          <p id="summary-line">完成了一组英语跟读。</p>
+        </div>
+
+        <div class="summary-stats">
+          <div>
+            <span id="summary-count">0</span>
+            <p>练习词句</p>
+          </div>
+          <div>
+            <span id="summary-attempts">0</span>
+            <p>开口尝试</p>
+          </div>
+        </div>
+
+        <div class="parent-note">
+          <p class="eyebrow">给家长的小提示</p>
+          <p id="parent-tip">夸孩子愿意开口，比纠正发音更重要。</p>
+        </div>
+
+        <div class="summary-actions">
+          <button class="action-button" id="repeat-button" type="button">再练一次</button>
+          <button class="action-button secondary" id="home-button" type="button">换个主题</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
