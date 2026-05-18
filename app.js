@@ -104,9 +104,8 @@ async function loadAudioManifest() {
 }
 
 function getAudioSource(text) {
-  const key = audioKey(text);
-  const typedPhrases = audioManifest.phrases?.[selectedVoiceType] || {};
-  return typedPhrases[text] || typedPhrases[key] || audioManifest.phrases[text] || audioManifest.phrases[key] || null;
+  // 禁用预录音频，统一使用系统 TTS 语音
+  return null;
 }
 
 function playAudioSource(src) {
@@ -129,16 +128,17 @@ function getUsableEnglishVoices() {
 
 function scoreVoice(voice, type = selectedVoiceType) {
   let score = 0;
-  const girlVoice = /Samantha|Jenny|Aria|Ava|Nicky|Zira|Joanna|Kendra|Kimberly|Serena|Tessa|Moira|Flo|Shelley|female|girl/i;
-  const boyVoice = /Aaron|Albert|Daniel|Fred|Alex|Tom|David|Mark|George|Arthur|Eddy|Reed|Rocko|male|boy/i;
+  const girlVoice = /Samantha|Jenny|Aria|Ava|Nicky|Zira|Joanna|Kendra|Kimberly|Serena|Tessa|Moira|Flo|Shelley|female|girl|IVONA|Emma|Sally/i;
+  const boyVoice = /Aaron|Albert|Daniel|Fred|Alex|Tom|David|Mark|George|Arthur|Eddy|Reed|Rocko|male|boy|Geraint|Nicolas|Oliver|Russell/i;
 
   if (type === "girl" && girlVoice.test(voice.name)) score += 90;
   if (type === "girl" && boyVoice.test(voice.name)) score -= 80;
   if (type === "boy" && boyVoice.test(voice.name)) score += 90;
   if (type === "boy" && girlVoice.test(voice.name)) score -= 80;
-  if (/Google US English|English United States|Microsoft/i.test(voice.name)) score += 24;
-  if (/natural|premium|enhanced/i.test(voice.name)) score += 18;
-  if (/en[-_]US/i.test(voice.lang)) score += 14;
+  if (/Google US English|English United States|Microsoft|Alex|Samantha|IVONA|Emma/i.test(voice.name)) score += 30;
+  if (/natural|premium|enhanced|high quality/i.test(voice.name)) score += 50;
+  if (/en[-_]US/i.test(voice.lang)) score += 20;
+  if (voice.localService || voice.voiceURI.includes('natural')) score += 15;
   return score;
 }
 
@@ -156,9 +156,10 @@ function getFriendlyVoice(type = selectedVoiceType) {
 }
 
 function makeGirlVoiceUtterance(text, options = {}) {
+  const voiceType = options.voiceType || selectedVoiceType;
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = "en-US";
-  utterance.voice = getFriendlyVoice();
+  utterance.voice = getFriendlyVoice(voiceType);
   utterance.rate = options.rate || 1.0;
   utterance.pitch = options.pitch || 1;
   utterance.volume = 0.9;
@@ -181,7 +182,15 @@ function previewVoice(voiceId) {
   preferredVoice = null;
   renderVoiceOptions();
   window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(makeGirlVoiceUtterance("Hello, let's learn English."));
+  // 显式获取新语音对象，确保使用最新的声音类型
+  const voice = getFriendlyVoice(selectedVoiceType);
+  const utterance = new SpeechSynthesisUtterance("Hello, let's learn English.");
+  utterance.lang = "en-US";
+  utterance.voice = voice;
+  utterance.rate = 1.0;
+  utterance.pitch = 1;
+  utterance.volume = 0.9;
+  window.speechSynthesis.speak(utterance);
 }
 
 function showScreen(name) {
@@ -350,12 +359,12 @@ function speak(text) {
   }
 
   if (!window.speechSynthesis) {
-    setFeedback("可以家长先读一遍", `请家长读：“${text}”，然后让孩子模仿。`);
+    setFeedback("可以家长先读一遍", `请家长读："${text}"，然后让孩子模仿。`);
     return;
   }
 
   window.speechSynthesis.cancel();
-  const utterance = makeGirlVoiceUtterance(text);
+  const utterance = makeGirlVoiceUtterance(text, { voiceType: selectedVoiceType });
   window.speechSynthesis.speak(utterance);
 }
 
@@ -372,9 +381,11 @@ function playWelcomeSound() {
   }
 
   window.speechSynthesis.cancel();
-  const utterance = makeGirlVoiceUtterance("Welcome to Little Echo! Let's start the adventure!", {
+  // 缩短欢迎语，减少合成延迟
+  const utterance = makeGirlVoiceUtterance("Let's go!", {
+    voiceType: selectedVoiceType,
     rate: 1.0,
-    pitch: 1
+    pitch: 1.05
   });
   utterance.onend = () => {
     soundButton.hidden = true;
@@ -450,6 +461,12 @@ function startTopic(topicId) {
   state.practiced = [];
   showScreen("game");
   renderItem();
+}
+
+function randomStart() {
+  if (topics.length === 0) return;
+  const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+  startTopic(randomTopic.id);
 }
 
 function markAttempt(success, transcript = "") {
@@ -551,6 +568,7 @@ function bindEvents() {
     showScreen("topic");
   });
 
+  document.querySelector("#hero-start-button")?.addEventListener("click", randomStart);
   listenButton.addEventListener("click", () => speak(currentItem().phrase));
   speakButton.addEventListener("click", startRecognition);
   nextButton.addEventListener("click", () => {
@@ -581,12 +599,29 @@ async function initApp() {
   await loadAudioManifest();
   renderVoiceOptions();
   if (window.speechSynthesis) {
+    // 页面加载时预热语音引擎
+    window.speechSynthesis.getVoices();
+    
     window.speechSynthesis.onvoiceschanged = () => {
       preferredVoice = null;
       renderVoiceOptions();
       getFriendlyVoice();
+      // 预热：播放一个静音音频来初始化语音引擎
+      if (window.speechSynthesis.paused === false) {
+        const warmUp = new SpeechSynthesisUtterance("");
+        warmUp.volume = 0;
+        window.speechSynthesis.speak(warmUp);
+      }
     };
     getFriendlyVoice();
+    
+    // 如果语音列表已经加载好，直接预热
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) {
+      const warmUp = new SpeechSynthesisUtterance("");
+      warmUp.volume = 0;
+      window.speechSynthesis.speak(warmUp);
+    }
   }
 
   try {
