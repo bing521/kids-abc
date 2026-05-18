@@ -1,0 +1,742 @@
+[
+  {
+    "id": "animals",
+    "title": "动物",
+    "description": "听听身边的小动物怎么说。",
+    "color": "#7bdcb5",
+    "items": [
+      {
+        "text": "cat",
+        "meaning": "小猫",
+        "tip": "可以学一声轻轻的 meow，再说 cat。",
+        "art": "cat",
+        "phrase": "cat"
+      },
+      {
+        "text": "dog",
+        "meaning": "小狗",
+        "tip": "孩子愿意开口就是很棒的一步。",
+        "art": "dog",
+        "phrase": "dog"
+      },
+      {
+        "text": "bird",
+        "meaning": "小鸟",
+        "tip": "把 bird 说得短短的、轻轻的。",
+        "art": "bird",
+        "phrase": "bird"
+      },
+      {
+        "text": "fish",
+        "meaning": "小鱼",
+        "tip": "可以用手做游泳动作，边做边说 fish。",
+        "art": "fish",
+        "phrase": "fish"
+      },
+      {
+        "text": "duck",
+        "meaning": "鸭子",
+        "tip": "先听 d 的开头，再一起说 duck。",
+        "art": "duck",
+        "phrase": "duck"
+      },
+      {
+        "text": "frog",
+        "meaning": "青蛙",
+        "tip": "夸孩子声音响亮，再慢慢来一次 frog。",
+        "art": "frog",
+        "phrase": "frog"
+      },
+      {
+        "text": "bear",
+        "meaning": "小熊",
+        "tip": "可以抱一抱玩具熊，再慢慢说 bear。",
+        "art": "bear",
+        "phrase": "bear"
+      },
+      {
+        "text": "rabbit",
+        "meaning": "兔子",
+        "tip": "做兔耳朵动作，轻轻说 rabbit。",
+        "art": "rabbit",
+        "phrase": "rabbit"
+      },
+      {
+        "text": "lion",
+        "meaning": "狮子",
+        "tip": "先小声吼一下，再勇敢说 lion。",
+        "art": "lion",
+        "phrase": "lion"
+      },
+      {
+        "text": "monkey",
+        "meaning": "猴子",
+        "tip": "做个调皮表情，然后一起说 monkey。",
+        "art": "monkey",
+        "phrase": "monkey"
+      },
+      {
+        "text": "cow",
+        "meaning": "奶牛",
+        "phrase": "cow",
+        "tip": "学一声 moo，再说 cow。",
+        "art": "bear"
+      },
+      {
+        "text": "horse",
+        "meaning": "马",
+        "phrase": "horse",
+        "tip": "做骑马动作，再说 horse。",
+        "art": "run"
+      },
+      {
+        "text": "sheep",
+        "meaning": "绵羊",
+        "phrase": "sheep",
+        "tip": "轻轻说 sheep，像软软的小羊。",
+        "art": "rabbit"
+      },
+      {
+        "text": "pig",
+        "meaning": "小猪",
+        "phrase": "pig",
+        "tip": "鼓起小脸，开心说 pig。",
+        "art": "dog"
+      },
+      {
+        "text": "tiger",
+        "meaning": "老虎",
+        "phrase": "tiger",
+        "tip": "小声吼一下，再说 tiger。",
+        "art": "lion"
+      },
+      {
+        "text": "elephant",
+        "meaning": "大象",
+        "phrase": "elephant",
+        "tip": "用手做长鼻子，说 elephant。",
+        "art": "bear"
+      },
+      {
+        "text": "panda",
+        "meaning": "熊猫",
+        "phrase": "panda",
+        "tip": "抱一抱自己，说 panda。",
+        "art": "bear"
+      },
+      {
+        "text": "giraffe",
+        "meaning": "长颈鹿",
+        "phrase": "giraffe",
+        "tip": "伸长脖子，说 giraffe。",
+        "art": "stand"
+      },
+      {
+        "text": "zebra",
+        "meaning": "斑马",
+        "phrase": "zebra",
+        "tip": "指一指条纹，说 zebra。",
+        "art": "horse"
+      },
+      {
+        "text": "turtle",
+        "meaning": "乌龟",
+        "phrase": "turtle",
+        "tip": "慢慢走一步，说 turtle。",
+        "art": "frog"
+      }
+    ]
+  },
+  {
+    "id": "food",
+    "title": "食物",
+    "description": "把爱吃的东西用英语说出来。",
+    "color": "#ffd86b",
+    "items": [
+      {
+        "text": "apple",
+        "meaning": "苹果",
+        "tip": "可以拿真实水果一起说 apple。",
+        "art": "apple",
+        "phrase": "apple"
+      },
+      {
+        "text": "banana",
+        "meaning": "香蕉",
+        "tip": "banana 有三个小节奏，拍手说一遍。",
+        "art": "banana",
+        "phrase": "banana"
+      },
+      {
+        "text": "milk",
+        "meaning": "牛奶",
+        "tip": "短短说 milk，不用追求一次完美。",
+        "art": "milk",
+        "phrase": "milk"
+      },
+      {
+        "text": "egg",
+        "meaning": "鸡蛋",
+        "tip": "egg 很短，鼓励孩子大胆发出来。",
+        "art": "egg",
+        "phrase": "egg"
+      },
+      {
+        "text": "cake",
+        "meaning": "蛋糕",
+        "tip": "让孩子假装闻一闻蛋糕，再说 cake。",
+        "art": "cake",
+        "phrase": "cake"
+      },
+      {
+        "text": "water",
+        "meaning": "水",
+        "tip": "water 可以听两遍，再跟着说。",
+        "art": "water",
+        "phrase": "water"
+      },
+      {
+        "text": "orange",
+        "meaning": "橙子",
+        "tip": "指一指圆圆的橙子，说 orange。",
+        "art": "orange",
+        "phrase": "orange"
+      },
+      {
+        "text": "bread",
+        "meaning": "面包",
+        "tip": "假装咬一口面包，再说 bread。",
+        "art": "bread",
+        "phrase": "bread"
+      },
+      {
+        "text": "rice",
+        "meaning": "米饭",
+        "tip": "rice 很短，慢慢听清楚再说。",
+        "art": "rice",
+        "phrase": "rice"
+      },
+      {
+        "text": "cookie",
+        "meaning": "饼干",
+        "tip": "用开心的声音说 cookie。",
+        "art": "cookie",
+        "phrase": "cookie"
+      },
+      {
+        "text": "cheese",
+        "meaning": "奶酪",
+        "phrase": "cheese",
+        "tip": "做闻一闻的动作，说 cheese。",
+        "art": "cake"
+      },
+      {
+        "text": "juice",
+        "meaning": "果汁",
+        "phrase": "juice",
+        "tip": "拿杯子假装喝，说 juice。",
+        "art": "drink"
+      },
+      {
+        "text": "noodles",
+        "meaning": "面条",
+        "phrase": "noodles",
+        "tip": "假装吸面条，说 noodles。",
+        "art": "rice"
+      },
+      {
+        "text": "soup",
+        "meaning": "汤",
+        "phrase": "soup",
+        "tip": "假装喝一口汤，说 soup。",
+        "art": "water"
+      },
+      {
+        "text": "candy",
+        "meaning": "糖果",
+        "phrase": "candy",
+        "tip": "用甜甜的声音说 candy。",
+        "art": "cookie"
+      },
+      {
+        "text": "ice cream",
+        "meaning": "冰淇淋",
+        "phrase": "ice cream",
+        "tip": "假装舔一口，说 ice cream。",
+        "art": "cake"
+      },
+      {
+        "text": "pizza",
+        "meaning": "披萨",
+        "phrase": "pizza",
+        "tip": "双手捧披萨，说 pizza。",
+        "art": "bread"
+      },
+      {
+        "text": "carrot",
+        "meaning": "胡萝卜",
+        "phrase": "carrot",
+        "tip": "像小兔子一样说 carrot。",
+        "art": "orange"
+      },
+      {
+        "text": "tomato",
+        "meaning": "番茄",
+        "phrase": "tomato",
+        "tip": "指红红的番茄，说 tomato。",
+        "art": "apple"
+      },
+      {
+        "text": "corn",
+        "meaning": "玉米",
+        "phrase": "corn",
+        "tip": "假装啃玉米，说 corn。",
+        "art": "banana"
+      }
+    ]
+  },
+  {
+    "id": "actions",
+    "title": "动作",
+    "description": "一边动一边说，身体也记住。",
+    "color": "#6bb8ff",
+    "items": [
+      {
+        "text": "jump",
+        "meaning": "跳一跳",
+        "tip": "真的跳一下，再快乐地说 jump。",
+        "art": "jump",
+        "phrase": "jump"
+      },
+      {
+        "text": "run",
+        "meaning": "跑一跑",
+        "tip": "用手做跑步动作，跟着节奏说 run。",
+        "art": "run",
+        "phrase": "run"
+      },
+      {
+        "text": "clap",
+        "meaning": "拍拍手",
+        "tip": "拍一下手，说 clap，马上给拥抱式鼓励。",
+        "art": "clap",
+        "phrase": "clap"
+      },
+      {
+        "text": "sit down",
+        "meaning": "坐下",
+        "tip": "家长先做动作，孩子更容易理解。",
+        "art": "sit",
+        "phrase": "sit down"
+      },
+      {
+        "text": "stand up",
+        "meaning": "站起来",
+        "tip": "站起来时一起说 stand up。",
+        "art": "stand",
+        "phrase": "stand up"
+      },
+      {
+        "text": "wave",
+        "meaning": "挥挥手",
+        "tip": "挥手说 wave，让声音和动作连起来。",
+        "art": "wave",
+        "phrase": "wave"
+      },
+      {
+        "text": "dance",
+        "meaning": "跳舞",
+        "tip": "摇一摇身体，再开心说 dance。",
+        "art": "dance",
+        "phrase": "dance"
+      },
+      {
+        "text": "sleep",
+        "meaning": "睡觉",
+        "tip": "闭眼假装睡觉，然后轻轻说 sleep。",
+        "art": "sleep",
+        "phrase": "sleep"
+      },
+      {
+        "text": "eat",
+        "meaning": "吃东西",
+        "tip": "做吃东西的动作，说 eat。",
+        "art": "eat",
+        "phrase": "eat"
+      },
+      {
+        "text": "drink",
+        "meaning": "喝水",
+        "tip": "拿杯子做动作，再说 drink。",
+        "art": "drink",
+        "phrase": "drink"
+      },
+      {
+        "text": "walk",
+        "meaning": "走路",
+        "phrase": "walk",
+        "tip": "走两步，说 walk。",
+        "art": "run"
+      },
+      {
+        "text": "swim",
+        "meaning": "游泳",
+        "phrase": "swim",
+        "tip": "用手划水，说 swim。",
+        "art": "fish"
+      },
+      {
+        "text": "read",
+        "meaning": "阅读",
+        "phrase": "read",
+        "tip": "打开一本书，说 read。",
+        "art": "sit"
+      },
+      {
+        "text": "sing",
+        "meaning": "唱歌",
+        "phrase": "sing",
+        "tip": "张开嘴巴，说 sing。",
+        "art": "wave"
+      },
+      {
+        "text": "draw",
+        "meaning": "画画",
+        "phrase": "draw",
+        "tip": "假装拿笔，说 draw。",
+        "art": "clap"
+      },
+      {
+        "text": "kick",
+        "meaning": "踢",
+        "phrase": "kick",
+        "tip": "轻轻踢一下空气，说 kick。",
+        "art": "jump"
+      },
+      {
+        "text": "throw",
+        "meaning": "扔",
+        "phrase": "throw",
+        "tip": "假装扔球，说 throw。",
+        "art": "wave"
+      },
+      {
+        "text": "open",
+        "meaning": "打开",
+        "phrase": "open",
+        "tip": "做开门动作，说 open。",
+        "art": "stand"
+      },
+      {
+        "text": "close",
+        "meaning": "关闭",
+        "phrase": "close",
+        "tip": "做关门动作，说 close。",
+        "art": "sit"
+      },
+      {
+        "text": "smile",
+        "meaning": "微笑",
+        "phrase": "smile",
+        "tip": "露出笑脸，说 smile。",
+        "art": "dance"
+      }
+    ]
+  },
+  {
+    "id": "colors",
+    "title": "颜色",
+    "description": "找到彩色卡片，大声说出颜色。",
+    "color": "#ff8fd1",
+    "items": [
+      {
+        "text": "red",
+        "meaning": "红色",
+        "tip": "找一找身边红色的东西，再说 red。",
+        "art": "color-red",
+        "phrase": "red"
+      },
+      {
+        "text": "blue",
+        "meaning": "蓝色",
+        "tip": "指一指蓝色卡片，慢慢说 blue。",
+        "art": "color-blue",
+        "phrase": "blue"
+      },
+      {
+        "text": "yellow",
+        "meaning": "黄色",
+        "tip": "像太阳一样亮亮地说 yellow。",
+        "art": "color-yellow",
+        "phrase": "yellow"
+      },
+      {
+        "text": "green",
+        "meaning": "绿色",
+        "tip": "做小树长高的动作，再说 green。",
+        "art": "color-green",
+        "phrase": "green"
+      },
+      {
+        "text": "orange",
+        "meaning": "橙色",
+        "tip": "看橙色卡片，分两小节说 orange。",
+        "art": "color-orange",
+        "phrase": "orange"
+      },
+      {
+        "text": "purple",
+        "meaning": "紫色",
+        "tip": "像魔法颜色一样说 purple。",
+        "art": "color-purple",
+        "phrase": "purple"
+      },
+      {
+        "text": "pink",
+        "meaning": "粉色",
+        "tip": "用轻轻甜甜的声音说 pink。",
+        "art": "color-pink",
+        "phrase": "pink"
+      },
+      {
+        "text": "black",
+        "meaning": "黑色",
+        "tip": "像夜晚一样低一点声音说 black。",
+        "art": "color-black",
+        "phrase": "black"
+      },
+      {
+        "text": "white",
+        "meaning": "白色",
+        "tip": "像云朵一样轻轻说 white。",
+        "art": "color-white",
+        "phrase": "white"
+      },
+      {
+        "text": "brown",
+        "meaning": "棕色",
+        "tip": "找一找木头或小熊的颜色，说 brown。",
+        "art": "color-brown",
+        "phrase": "brown"
+      },
+      {
+        "text": "gray",
+        "meaning": "灰色",
+        "phrase": "gray",
+        "tip": "像小石头一样说 gray。",
+        "art": "color-gray"
+      },
+      {
+        "text": "gold",
+        "meaning": "金色",
+        "phrase": "gold",
+        "tip": "像奖牌一样闪亮地说 gold。",
+        "art": "color-gold"
+      },
+      {
+        "text": "silver",
+        "meaning": "银色",
+        "phrase": "silver",
+        "tip": "像月光一样说 silver。",
+        "art": "color-silver"
+      },
+      {
+        "text": "violet",
+        "meaning": "紫罗兰色",
+        "phrase": "violet",
+        "tip": "轻轻说 violet。",
+        "art": "color-violet"
+      },
+      {
+        "text": "rainbow",
+        "meaning": "彩虹色",
+        "phrase": "rainbow",
+        "tip": "伸手画彩虹，说 rainbow。",
+        "art": "color-rainbow"
+      },
+      {
+        "text": "navy",
+        "meaning": "深蓝色",
+        "phrase": "navy",
+        "tip": "像夜空一样说 navy。",
+        "art": "color-navy"
+      },
+      {
+        "text": "turquoise",
+        "meaning": "青绿色",
+        "phrase": "turquoise",
+        "tip": "慢慢听，再说 turquoise。",
+        "art": "color-turquoise"
+      },
+      {
+        "text": "beige",
+        "meaning": "米色",
+        "phrase": "beige",
+        "tip": "像小饼干一样说 beige。",
+        "art": "color-beige"
+      },
+      {
+        "text": "lime",
+        "meaning": "青柠色",
+        "phrase": "lime",
+        "tip": "酸酸甜甜地说 lime。",
+        "art": "color-lime"
+      },
+      {
+        "text": "maroon",
+        "meaning": "栗色",
+        "phrase": "maroon",
+        "tip": "慢慢说 maroon。",
+        "art": "color-maroon"
+      }
+    ]
+  },
+  {
+    "id": "daily-phrases",
+    "title": "魔法短句",
+    "description": "抽一张魔法卡，把常用短句说出来。",
+    "color": "#9b7cff",
+    "items": [
+      {
+        "text": "good morning",
+        "meaning": "早上好",
+        "phrase": "good morning",
+        "tip": "早上见面时，笑着说 good morning。",
+        "art": "phrase-1"
+      },
+      {
+        "text": "good night",
+        "meaning": "晚安",
+        "phrase": "good night",
+        "tip": "睡觉前轻轻说 good night。",
+        "art": "phrase-2"
+      },
+      {
+        "text": "thank you",
+        "meaning": "谢谢你",
+        "phrase": "thank you",
+        "tip": "拿到东西时，开心说 thank you。",
+        "art": "phrase-3"
+      },
+      {
+        "text": "hello friend",
+        "meaning": "你好朋友",
+        "phrase": "hello friend",
+        "tip": "挥挥手，对朋友说 hello friend。",
+        "art": "phrase-4"
+      },
+      {
+        "text": "my toy",
+        "meaning": "我的玩具",
+        "phrase": "my toy",
+        "tip": "抱着喜欢的玩具，说 my toy。",
+        "art": "phrase-5"
+      },
+      {
+        "text": "big smile",
+        "meaning": "大大的笑",
+        "phrase": "big smile",
+        "tip": "露出大笑脸，说 big smile。",
+        "art": "phrase-6"
+      },
+      {
+        "text": "little star",
+        "meaning": "小星星",
+        "phrase": "little star",
+        "tip": "指一指星星，说 little star。",
+        "art": "phrase-7"
+      },
+      {
+        "text": "blue sky",
+        "meaning": "蓝天",
+        "phrase": "blue sky",
+        "tip": "抬头看看天空，说 blue sky。",
+        "art": "phrase-8"
+      },
+      {
+        "text": "red apple",
+        "meaning": "红苹果",
+        "phrase": "red apple",
+        "tip": "看到苹果时，把两个词连起来说 red apple。",
+        "art": "phrase-9"
+      },
+      {
+        "text": "drink water",
+        "meaning": "喝水",
+        "phrase": "drink water",
+        "tip": "拿起杯子，边做动作边说 drink water。",
+        "art": "phrase-10"
+      },
+      {
+        "text": "yes please",
+        "meaning": "好的，请",
+        "phrase": "yes please",
+        "tip": "想要东西时，说 yes please。",
+        "art": "phrase-11"
+      },
+      {
+        "text": "no thanks",
+        "meaning": "不用了，谢谢",
+        "phrase": "no thanks",
+        "tip": "不想要时，轻轻说 no thanks。",
+        "art": "phrase-12"
+      },
+      {
+        "text": "I am happy",
+        "meaning": "我很开心",
+        "phrase": "I am happy",
+        "tip": "笑一笑，说 I am happy。",
+        "art": "phrase-13"
+      },
+      {
+        "text": "I am ready",
+        "meaning": "我准备好了",
+        "phrase": "I am ready",
+        "tip": "举起小手，说 I am ready。",
+        "art": "phrase-14"
+      },
+      {
+        "text": "let us play",
+        "meaning": "我们玩吧",
+        "phrase": "let us play",
+        "tip": "邀请家长一起说 let us play。",
+        "art": "phrase-15"
+      },
+      {
+        "text": "come here",
+        "meaning": "来这里",
+        "phrase": "come here",
+        "tip": "招招手，说 come here。",
+        "art": "phrase-16"
+      },
+      {
+        "text": "look at me",
+        "meaning": "看我",
+        "phrase": "look at me",
+        "tip": "指指自己，说 look at me。",
+        "art": "phrase-17"
+      },
+      {
+        "text": "well done",
+        "meaning": "做得好",
+        "phrase": "well done",
+        "tip": "给自己鼓掌，说 well done。",
+        "art": "phrase-18"
+      },
+      {
+        "text": "try again",
+        "meaning": "再试一次",
+        "phrase": "try again",
+        "tip": "不怕错，说 try again。",
+        "art": "phrase-19"
+      },
+      {
+        "text": "see you",
+        "meaning": "再见",
+        "phrase": "see you",
+        "tip": "挥挥手，说 see you。",
+        "art": "phrase-20"
+      }
+    ]
+  }
+]

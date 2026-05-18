@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
+    <div class="playground-bg" aria-hidden="true">
+      <span class="shape shape-star">★</span>
+      <span class="shape shape-heart">♥</span>
+      <span class="shape shape-dot"></span>
+      <span class="shape shape-ring"></span>
+      <span class="shape shape-rainbow"></span>
+      <span class="shape shape-bolt">⚡</span>
+    </div>
     <main class="app-shell">
       <section id="topic-screen" class="screen topic-screen" aria-labelledby="app-title">
         <div class="topbar">
@@ -19,8 +27,11 @@
 
         <div class="hero-band">
           <div class="mascot" aria-hidden="true">
+            <div class="speech-bubble">来闯关吧！</div>
             <svg viewBox="0 0 180 180" role="img">
+              <circle cx="90" cy="90" r="82" fill="#fff" opacity=".85" />
               <circle cx="90" cy="90" r="74" fill="#ffe08a" />
+              <path d="M54 38c18-22 54-22 72 0" fill="none" stroke="#8f7cff" stroke-width="12" stroke-linecap="round" />
               <circle cx="68" cy="74" r="10" fill="#30313d" />
               <circle cx="112" cy="74" r="10" fill="#30313d" />
               <path d="M62 112c16 20 40 20 56 0" fill="none" stroke="#30313d" stroke-width="8" stroke-linecap="round" />
@@ -28,14 +39,30 @@
               <path d="M148 91c18-12 19-34 4-45-15-10-34 0-37 18" fill="#ffb7a0" />
               <circle cx="58" cy="96" r="9" fill="#ff9aa8" />
               <circle cx="122" cy="96" r="9" fill="#ff9aa8" />
+              <path d="M38 138c31 22 73 22 104 0" fill="none" stroke="#5ee0b7" stroke-width="10" stroke-linecap="round" />
             </svg>
           </div>
           <div>
-            <p class="hero-copy">每天 5-10 分钟，听一听，说一说，和孩子一起把英文说出口。</p>
+            <p class="hero-copy">选择一个冒险世界，开始英语闯关！</p>
+            <p class="hero-subcopy">每说出一个英文词，就通关一格，收集星星打开终点宝箱。</p>
+            <div class="hero-rewards" aria-label="今日奖励">
+              <span>★</span>
+              <span>★</span>
+              <span>★</span>
+              <strong>今天去闯 10 个小关卡</strong>
+            </div>
+            <button class="hero-start" type="button" onclick="document.querySelector('#topic-grid').scrollIntoView({ behavior: 'smooth', block: 'center' })">
+              开始冒险
+            </button>
+            <button class="sound-button" id="sound-button" type="button">开启声音</button>
             <div class="status-line" id="support-status">正在检测语音能力...</div>
           </div>
         </div>
 
+        <div class="map-title">
+          <p class="eyebrow">选择冒险地图</p>
+          <h2>今天想去哪一关？</h2>
+        </div>
         <div class="topic-grid" id="topic-grid" aria-label="选择练习主题"></div>
       </section>
 
@@ -52,11 +79,27 @@
           </div>
         </div>
 
+        <div class="mission-panel">
+          <div>
+            <p class="mission-label" id="mission-label">第 1 关</p>
+            <h2 id="mission-title">听音小任务</h2>
+          </div>
+          <div class="treasure-badge" aria-hidden="true">宝箱</div>
+        </div>
+
+        <div class="reward-row" id="reward-row" aria-label="本轮关卡进度"></div>
+
         <div class="word-stage">
+          <div class="stage-sparkles" aria-hidden="true">
+            <span>★</span>
+            <span>●</span>
+            <span>♥</span>
+          </div>
           <div class="illustration-frame" id="illustration-frame"></div>
-          <p class="prompt-label">Listen and say</p>
+          <p class="prompt-label">通关口令</p>
           <h2 id="word-text">cat</h2>
           <p id="word-meaning" class="meaning">小猫</p>
+          <p id="word-phrase" class="phrase">cute cat</p>
         </div>
 
         <div class="control-panel">
@@ -75,13 +118,13 @@
           <p id="feedback-detail">家长可以先示范一次，然后让孩子模仿。</p>
         </div>
 
-        <button class="next-button" id="next-button" type="button" disabled>下一题</button>
+        <button class="next-button is-locked" id="next-button" type="button" aria-disabled="true">完成本关后继续</button>
       </section>
 
       <section id="summary-screen" class="screen summary-screen hidden">
         <div class="summary-hero">
           <div class="summary-badge" aria-hidden="true">★</div>
-          <h2>今天开口啦！</h2>
+          <h2>通关成功！</h2>
           <p id="summary-line">完成了一组英语跟读。</p>
         </div>
 
