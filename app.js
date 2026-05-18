@@ -495,11 +495,15 @@ function startRecognition() {
   const item = currentItem();
 
   if (!speechSupported) {
-    markAttempt(true, "");
+    setFeedback("提示", "当前浏览器不支持语音识别，请使用 Safari 或 Chrome。");
     return;
   }
 
-  if (state.listening) return;
+  if (state.listening) {
+    state.recognition?.abort?.();
+    state.listening = false;
+    return;
+  }
 
   const recognition = new SpeechRecognition();
   state.recognition = recognition;
@@ -510,7 +514,7 @@ function startRecognition() {
   recognition.didHearResult = false;
 
   speakButton.textContent = "正在听...";
-  setFeedback("我在听哦", `请孩子说：“${item.phrase}”。`);
+  setFeedback("我在听哦", `请孩子说："${item.phrase}"。`);
 
   recognition.onresult = (event) => {
     recognition.didHearResult = true;
@@ -519,20 +523,27 @@ function startRecognition() {
     markAttempt(matched, transcript);
   };
 
-  recognition.onerror = () => {
+  recognition.onerror = (event) => {
     recognition.didHearResult = true;
+    // 如果是用户主动停止，不显示错误
+    if (event.error === 'aborted') return;
+    console.warn("语音识别错误:", event.error);
     markAttempt(false);
   };
 
   recognition.onend = () => {
-    if (!recognition.didHearResult) {
-      markAttempt(false);
-    }
     state.listening = false;
     speakButton.innerHTML = '<span aria-hidden="true">●</span>跟我说';
   };
 
-  recognition.start();
+  try {
+    recognition.start();
+  } catch (e) {
+    console.error("无法启动语音识别:", e);
+    state.listening = false;
+    speakButton.innerHTML = '<span aria-hidden="true">●</span>跟我说';
+    setFeedback("提示", "无法启动语音识别，请检查麦克风权限。");
+  }
 }
 
 function nextItem() {
