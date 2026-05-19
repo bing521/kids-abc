@@ -370,6 +370,7 @@ function updateNextGate() {
   setNextLocked(!ready);
   if (ready) {
     nextButton.textContent = state.index < state.topic.items.length - 1 ? "进入下一关" : "打开终点宝箱";
+    setFeedback("听说闭环完成！", replayButton?.classList.contains("hidden") ? "已经听过标准音，也完成了一次跟读。" : "已经听过标准音，也完成了一次跟读。可以先回放自己的声音。");
     return;
   }
   if (state.heardCurrent) {
@@ -422,7 +423,7 @@ function renderItem() {
   state.spokeCurrent = false;
   speakButton.disabled = false;
   updateNextGate();
-  setFeedback("闯关任务开始！", "先听英文，再按下跟我说。说出口就能点亮这一关。");
+  setFeedback("先听，再开口", "点“听一听”听标准音，再点“跟我说”录下孩子的声音。顺序不限。");
 }
 
 function renderRewards() {
@@ -469,10 +470,10 @@ function markAttempt(success, transcript = "") {
     playSuccessSound();
     illustrationFrame.classList.remove("celebrate");
     window.requestAnimationFrame(() => illustrationFrame.classList.add("celebrate"));
-    setFeedback("本关通过！", transcript ? `我听到：“${transcript}”。星星已点亮，准备进下一关。` : `${item.tip} 口令是 ${item.phrase}。`);
+    setFeedback("开口完成！", transcript ? `我听到：“${transcript}”。可以回放听听自己的声音。` : "已经完成一次跟读，可以回放听听自己的声音。");
   } else {
     playSuccessSound();
-    setFeedback("本关通过！", "已经勇敢开口啦。家长读慢一点，孩子愿意跟就是进步。");
+    setFeedback("开口完成！", "愿意开口就是进步。可以回放听听，再决定要不要多练一次。");
   }
 }
 
@@ -530,7 +531,11 @@ function playRecording() {
   setFeedback("回放中...", "听一下刚才说的。");
   audio.onended = () => {
     URL.revokeObjectURL(audioUrl);
-    setFeedback("闯关任务开始！", "先听英文，再按下跟我说。说出口就能点亮这一关。");
+    if (state.heardCurrent && state.spokeCurrent) {
+      setFeedback("听完自己的声音啦", "觉得不错就进入下一关；想再练也可以再点“跟我说”。");
+      return;
+    }
+    setFeedback("听完自己的声音啦", "还差一步，完成“听一听”和“跟我说”就能继续。");
   };
 }
 
@@ -538,6 +543,7 @@ function startRecognition() {
   const item = currentItem();
 
   if (!speechSupported) {
+    setFeedback("开口完成！", "当前浏览器不支持自动识别，家长可以听孩子跟读并鼓励。");
     markAttempt(false);
     return;
   }
@@ -553,6 +559,7 @@ function startRecognition() {
   // 开始录音
   startRecording().then(recordingStarted => {
     if (!recordingStarted) {
+      setFeedback("开口完成！", "无法录音时也不用卡住，家长可以听孩子跟读并鼓励。");
       markAttempt(false);
       return;
     }
@@ -567,7 +574,7 @@ function startRecognition() {
     recognition.didMarkAttempt = false;
 
     speakButton.textContent = "正在听...";
-    setFeedback("我在听哦", `请孩子说："${item.phrase}"。`);
+    setFeedback("我在听哦", `请孩子说："${item.phrase}"。结束后可以回放。`);
 
     recognition.onresult = (event) => {
       recognition.didHearResult = true;
@@ -650,6 +657,9 @@ function bindEvents() {
     state.heardCurrent = true;
     updateNextGate();
     speak(currentItem().phrase);
+    if (!state.spokeCurrent) {
+      setFeedback("标准音播放中", "听完后点“跟我说”，录下孩子自己的声音。");
+    }
   });
   speakButton.addEventListener("click", startRecognition);
   replayButton?.addEventListener("click", playRecording);
