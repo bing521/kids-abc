@@ -12,7 +12,9 @@ const state = {
   recognition: null,
   mediaRecorder: null,
   audioChunks: [],
-  recordedBlob: null
+  recordedBlob: null,
+  heardCurrent: false,
+  spokeCurrent: false
 };
 
 const screens = {
@@ -46,7 +48,6 @@ const voiceOptions = document.querySelector("#voice-options");
 let audioContext = null;
 let preferredVoice = null;
 let selectedVoiceType = window.localStorage.getItem("little-echo-voice-type") || "girl";
-let audioManifest = { phrases: {}, ui: {} };
 
 function getAudioContext() {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -87,38 +88,6 @@ function playSuccessSound() {
 
 function playTreasureSound() {
   playToneSequence([[392, 0, 0.12], [494, 0.12, 0.12], [587, 0.24, 0.18], [784, 0.42, 0.2]], "sine", 0.05);
-}
-
-function audioKey(text) {
-  return normalize(text).replace(/\s+/g, "-");
-}
-
-async function loadAudioManifest() {
-  try {
-    const response = await fetch("./audio-manifest.json", { cache: "no-store" });
-    if (!response.ok) return;
-    const manifest = await response.json();
-    audioManifest = {
-      phrases: manifest.phrases || {},
-      ui: manifest.ui || {}
-    };
-  } catch (error) {
-    audioManifest = { phrases: {}, ui: {} };
-  }
-}
-
-function getAudioSource(text) {
-  // 禁用预录音频，统一使用系统 TTS 语音
-  return null;
-}
-
-function playAudioSource(src) {
-  if (!src) return false;
-  window.speechSynthesis?.cancel();
-  const audio = new Audio(src);
-  audio.volume = 0.96;
-  audio.play().catch((error) => console.warn("Audio playback failed", error));
-  return true;
 }
 
 function getUsableEnglishVoices() {
@@ -358,10 +327,6 @@ function saveTopicProgress(topicId, completedCount) {
 }
 
 function speak(text) {
-  if (playAudioSource(getAudioSource(text))) {
-    return;
-  }
-
   if (!window.speechSynthesis) {
     setFeedback("可以家长先读一遍", `请家长读："${text}"，然后让孩子模仿。`);
     return;
@@ -373,12 +338,6 @@ function speak(text) {
 }
 
 function playWelcomeSound() {
-  const welcomeAudio = audioManifest.ui?.[selectedVoiceType]?.welcome || audioManifest.ui?.welcome;
-  if (playAudioSource(welcomeAudio)) {
-    soundButton.hidden = true;
-    return;
-  }
-
   if (!window.speechSynthesis) {
     soundButton.hidden = true;
     return;
@@ -404,6 +363,24 @@ function playLockedSound() {
 function setNextLocked(locked) {
   nextButton.classList.toggle("is-locked", locked);
   nextButton.setAttribute("aria-disabled", String(locked));
+}
+
+function updateNextGate() {
+  const ready = state.heardCurrent && state.spokeCurrent;
+  setNextLocked(!ready);
+  if (ready) {
+    nextButton.textContent = state.index < state.topic.items.length - 1 ? "进入下一关" : "打开终点宝箱";
+    return;
+  }
+  if (state.heardCurrent) {
+    nextButton.textContent = "还要跟我说";
+    return;
+  }
+  if (state.spokeCurrent) {
+    nextButton.textContent = "还要听一听";
+    return;
+  }
+  nextButton.textContent = "听一听并跟我说";
 }
 
 function normalize(value) {
@@ -441,9 +418,10 @@ function renderItem() {
   wordText.textContent = item.text;
   wordMeaning.textContent = item.meaning;
   wordPhrase.textContent = item.phrase;
-  setNextLocked(true);
+  state.heardCurrent = false;
+  state.spokeCurrent = false;
   speakButton.disabled = false;
-  nextButton.textContent = "完成本关后继续";
+  updateNextGate();
   setFeedback("闯关任务开始！", "先听英文，再按下跟我说。说出口就能点亮这一关。");
 }
 
@@ -484,8 +462,8 @@ function markAttempt(success, transcript = "") {
   }
   saveTopicProgress(state.topic.id, state.practiced.length);
   renderRewards();
-  setNextLocked(false);
-  nextButton.textContent = state.index < state.topic.items.length - 1 ? "进入下一关" : "打开终点宝箱";
+  state.spokeCurrent = true;
+  updateNextGate();
 
   if (success) {
     playSuccessSound();
@@ -508,9 +486,17 @@ async function startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     state.mediaRecorder = new MediaRecorder(stream);
     state.audioChunks = [];
+    state.recordedBlob = null;
     state.mediaRecorder.ondataavailable = (event) => {
       if (event.data.size > 0) {
         state.audioChunks.push(event.data);
+      }
+    };
+    state.mediaRecorder.onstop = () => {
+      state.mediaRecorder.stream.getTracks().forEach((track) => track.stop());
+      if (state.audioChunks.length > 0) {
+        state.recordedBlob = new Blob(state.audioChunks, { type: state.mediaRecorder.mimeType || "audio/webm" });
+        replayButton?.classList.remove("hidden");
       }
     };
     state.mediaRecorder.start();
@@ -524,13 +510,12 @@ async function startRecording() {
 function stopRecording() {
   if (state.mediaRecorder && state.mediaRecorder.state !== "inactive") {
     state.mediaRecorder.stop();
-    state.mediaRecorder.stream.getTracks().forEach(track => track.stop());
   }
 }
 
 function getRecordedAudio() {
-  if (state.audioChunks.length === 0) return null;
-  return URL.createObjectURL(new Blob(state.audioChunks, { type: "audio/webm" }));
+  if (!state.recordedBlob) return null;
+  return URL.createObjectURL(state.recordedBlob);
 }
 
 function playRecording() {
@@ -541,7 +526,7 @@ function playRecording() {
   }
   const audio = new Audio(audioUrl);
   audio.volume = 1;
-  audio.play();
+  audio.play().catch(() => setFeedback("提示", "回放失败，请再录一次。"));
   setFeedback("回放中...", "听一下刚才说的。");
   audio.onended = () => {
     URL.revokeObjectURL(audioUrl);
@@ -553,7 +538,7 @@ function startRecognition() {
   const item = currentItem();
 
   if (!speechSupported) {
-    setFeedback("提示", "当前浏览器不支持语音识别，请使用 Safari 或 Chrome。");
+    markAttempt(false);
     return;
   }
 
@@ -568,7 +553,7 @@ function startRecognition() {
   // 开始录音
   startRecording().then(recordingStarted => {
     if (!recordingStarted) {
-      setFeedback("提示", "无法访问麦克风，请检查权限设置。");
+      markAttempt(false);
       return;
     }
 
@@ -579,6 +564,7 @@ function startRecognition() {
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
     recognition.didHearResult = false;
+    recognition.didMarkAttempt = false;
 
     speakButton.textContent = "正在听...";
     setFeedback("我在听哦", `请孩子说："${item.phrase}"。`);
@@ -588,16 +574,16 @@ function startRecognition() {
       stopRecording();
       const transcript = event.results[0][0].transcript;
       const matched = roughlyMatches(transcript, item.phrase);
-      replayButton?.classList.remove("hidden");
+      recognition.didMarkAttempt = true;
       markAttempt(matched, transcript);
     };
 
     recognition.onerror = (event) => {
-      recognition.didHearResult = true;
       stopRecording();
       if (event.error === 'aborted') return;
+      recognition.didHearResult = true;
       console.warn("语音识别错误:", event.error);
-      replayButton?.classList.remove("hidden");
+      recognition.didMarkAttempt = true;
       markAttempt(false);
     };
 
@@ -605,8 +591,9 @@ function startRecognition() {
       stopRecording();
       state.listening = false;
       speakButton.innerHTML = '<span aria-hidden="true">●</span>跟我说';
-      if (!recognition.didHearResult && state.audioChunks.length > 0) {
-        replayButton?.classList.remove("hidden");
+      if (!recognition.didHearResult && !recognition.didMarkAttempt && !screens.game.classList.contains("hidden")) {
+        recognition.didMarkAttempt = true;
+        markAttempt(false);
       }
     };
 
@@ -617,7 +604,7 @@ function startRecognition() {
       stopRecording();
       state.listening = false;
       speakButton.innerHTML = '<span aria-hidden="true">●</span>跟我说';
-      setFeedback("提示", "无法启动语音识别，请检查麦克风权限。");
+      markAttempt(false);
     }
   });
 }
@@ -659,13 +646,23 @@ function bindEvents() {
   });
 
   document.querySelector("#hero-start-button")?.addEventListener("click", randomStart);
-  listenButton.addEventListener("click", () => speak(currentItem().phrase));
+  listenButton.addEventListener("click", () => {
+    state.heardCurrent = true;
+    updateNextGate();
+    speak(currentItem().phrase);
+  });
   speakButton.addEventListener("click", startRecognition);
   replayButton?.addEventListener("click", playRecording);
   nextButton.addEventListener("click", () => {
     if (nextButton.getAttribute("aria-disabled") === "true") {
       playLockedSound();
-      setFeedback("还不能进入下一关", "先点“听一听”，再点“跟我说”。说出口以后就能继续啦。");
+      if (!state.heardCurrent && !state.spokeCurrent) {
+        setFeedback("还不能进入下一关", "先点“听一听”，再点“跟我说”。顺序不限。");
+      } else if (!state.heardCurrent) {
+        setFeedback("还差一步", "还要点一次“听一听”，听完就能继续。");
+      } else {
+        setFeedback("还差一步", "还要点一次“跟我说”，开口后就能继续。");
+      }
       return;
     }
     nextItem();
@@ -687,7 +684,6 @@ function bindEvents() {
 async function initApp() {
   supportStatus.textContent = "正在加载本地词表...";
   bindEvents();
-  await loadAudioManifest();
   renderVoiceOptions();
   if (window.speechSynthesis) {
     // 页面加载时预热语音引擎
